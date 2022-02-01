@@ -50,14 +50,56 @@ const ChatTest = (id) => {
         }
       `;
 
+  const getNewData = client
+    .query({
+      query: gql`
+        query {
+          room(id: "${chatId}") {
+            messages {
+              id
+              body
+              user {
+                firstName
+                lastName
+              }
+            }
+          }
+        }
+      `,
+    })
+    .then((result) => result?.data?.room?.messages);
+
+  const newMessages = Object.keys(getNewData).map((item, index) => {
+    return {
+      _id: item.id,
+      text: item.body,
+      createdAt: new Date(),
+      user: {
+        _id: user.id,
+        name: `${item.firstName} ${item.lastName}`,
+      },
+    };
+  });
+
+  console.log(newMessages);
+
   function GetTheMessage() {
     const { loading, error, data } = useQuery(GET_MESSAGES);
+
     if (loading) return <Text>Loading...</Text>;
     if (error) return <Text>Error :(</Text>;
     console.log(data.room.messages);
-    return data.room.messages.map(({ insertedAt, body }) => (
-      <View key={insertedAt}>
-        <Text>{insertedAt}</Text>
+
+    const users = data.room.messages;
+
+    console.log(users);
+    users.forEach(function (index) {
+      console.log(users[index].user.firstName);
+    });
+
+    return data.room.messages.map(({ id, body, user }) => (
+      <View key={id}>
+        <Text>{user.firstName + " " + user.lastName}</Text>
         <Text>{body}</Text>
       </View>
     ));
