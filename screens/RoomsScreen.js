@@ -1,5 +1,6 @@
 import { View, Text, Button } from "react-native";
-import React from "react";
+
+import React, { useState } from "react";
 import { StyleSheet } from "react-native-web";
 import {
   ApolloClient,
@@ -67,7 +68,7 @@ const GoToRoom = (roomId) => {
 
 const RoomsScreen = (props) => {
   const NavigateToChatScreen = (props, id) => {
-    props.navigation.navigate("Chat", {
+    props.navigation.navigate("ChatTest", {
       chatID: id,
     });
     console.log(id);

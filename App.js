@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ChatScreen from "./screens/ChatScreen";
 import RoomsScreen from "./screens/RoomsScreen";
+import ChatTest from "./screens/ChatTest";
 
 import {
   ApolloClient,
@@ -23,6 +24,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="Rooms">
         <Stack.Screen name="Rooms" component={RoomsScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="ChatTest" component={ChatTest} />
       </Stack.Navigator>
     </NavigationContainer>
   );
