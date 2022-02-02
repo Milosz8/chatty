@@ -7,14 +7,13 @@ import {
   ApolloProvider,
   useQuery,
   gql,
+  useMutation,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { GiftedChat } from "react-native-gifted-chat";
 
 const ChatScreen = (id) => {
-  console.log(id);
   const chatId = id.route.params.chatID;
-  console.log(chatId);
   const httpLink = createHttpLink({
     uri: "https://chat.thewidlarzgroup.com/api/graphql",
   });
@@ -36,17 +35,6 @@ const ChatScreen = (id) => {
     cache: new InMemoryCache(),
   });
 
-  const SEND_MESSAGE = gql`
-    mutation {
-      sendMessage(
-        body: "${messages}"
-        roomId: "${chatId}"
-      ) {
-        id
-      }
-    }
-  `;
-
   const GET_MESSAGES = gql`
     query {
       room(id: "${chatId}") {
@@ -55,6 +43,7 @@ const ChatScreen = (id) => {
           body
           insertedAt
           user {
+            id
             firstName
             lastName
           }
@@ -63,92 +52,58 @@ const ChatScreen = (id) => {
     }
   `;
 
-  // function SendMessage() {
-  //   const { loading, error, data } = useQuery(SEND_MESSAGE, {
-
-  //     pollInterval: 500,
-  //   });
-
-  //   if (loading) return null;
-  //   if (error) return `Error! ${error}`;
-
-  //   return (
-  //     <img src={data.dog.displayImage} style={{ height: 100, width: 100 }} />
-  //   );
-  // }
+  function SendTheMessage(messages) {
+    //messages always gets [0]
+    const msg = messages[0].text;
+    const sendTheMessage = client.mutate({
+      mutation: gql`
+      mutation {
+        sendMessage(
+          body: "${msg}"
+          roomId: "${chatId}"
+        ) {
+          id
+        }
+      }
+    `,
+    });
+    console.log(msg);
+  }
 
   function GetTheMessage() {
     const { loading, error, data } = useQuery(GET_MESSAGES, {
       pollInterval: 500,
     });
-
     if (loading) return <Text>Loading...</Text>;
     if (error) return <Text>Error :(</Text>;
-
     const users = data.room.messages;
-
     const usersArray = Object.keys(users).map((index) => {
       return {
         _id: users[index].id,
         text: users[index].body,
         createdAt: users[index].insertedAt,
         user: {
-          _id: index, // to fix propper user id
+          _id: users[index].user.id,
           name: `${users[index].user.firstName} ${users[index].user.lastName}`,
         },
       };
     });
 
-    users.forEach(function (item, index) {
-      console.log(users[index].user.firstName);
-    });
-
-    const messagesList = data.room.messages.map(({ id, body, user }) => (
-      <View key={id}>
-        <Text>{user.firstName + " " + user.lastName}</Text>
-        <Text>{body}</Text>
-      </View>
-    ));
-
-    console.log("dupa", usersArray);
-
     return (
       <GiftedChat
         messages={usersArray}
         showAvatarForEveryMessage={true}
-        onSend={(messages) => onSend(messages)}
+        onSend={(messages) => SendTheMessage(messages)}
         user={{
-          _id: 1,
+          _id: "719276e0-7889-4ee4-93ef-77eea1de4c17",
         }}
+        //user id value from login screen (if implemented)
       />
     );
   }
 
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    // allMessages();
-  }, []);
-  const allMessages = async () => {
-    // const a = await getAllMessages;
-    // console.log(a);
-    // setMessages(a);
-  };
-
-  console.log(messages);
-
-  //sending message
-
-  const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages)
-    );
-  }, []);
-
   return (
     <ApolloProvider client={client}>
-      {/* <Text>Chat</Text> */}
-
       <GetTheMessage />
     </ApolloProvider>
   );

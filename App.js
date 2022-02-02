@@ -6,23 +6,26 @@ import ChatScreen from "./screens/ChatScreen";
 import RoomsScreen from "./screens/RoomsScreen";
 import ChatTest from "./screens/ChatTest";
 
-import {
-  ApolloClient,
-  InMemoryCache,
-  createHttpLink,
-  ApolloProvider,
-  useQuery,
-  gql,
-} from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Rooms">
-        <Stack.Screen name="Rooms" component={RoomsScreen} />
+        <Stack.Screen
+          name="Rooms"
+          component={RoomsScreen}
+          options={{
+            title: "Rooms",
+            headerStyle: {
+              backgroundColor: "#B6DEFD",
+            },
+            headerTintColor: "#5603AD",
+            headerTitleStyle: {
+              fontWeight: "bold",
+            },
+          }}
+        />
         <Stack.Screen name="Chat" component={ChatScreen} />
         <Stack.Screen name="ChatTest" component={ChatTest} />
       </Stack.Navigator>

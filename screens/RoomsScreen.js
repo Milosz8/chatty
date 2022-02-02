@@ -71,7 +71,7 @@ const RoomsScreen = (props) => {
     props.navigation.navigate("Chat", {
       chatID: id,
     });
-    console.log(id);
+
     return id;
   };
 
@@ -80,7 +80,6 @@ const RoomsScreen = (props) => {
 
     if (loading) return <Text>Loading...</Text>;
     if (error) return <Text>Error :(</Text>;
-    console.log(data.usersRooms.rooms);
     return data.usersRooms.rooms.map(({ id, name }) => (
       <View key={id} style={styles.RoomsWrapper}>
         <Text onPress={() => NavigateToChatScreen(props, id)}>{name}</Text>
