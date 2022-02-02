@@ -68,7 +68,7 @@ const GoToRoom = (roomId) => {
 
 const RoomsScreen = (props) => {
   const NavigateToChatScreen = (props, id) => {
-    props.navigation.navigate("ChatTest", {
+    props.navigation.navigate("Chat", {
       chatID: id,
     });
     console.log(id);

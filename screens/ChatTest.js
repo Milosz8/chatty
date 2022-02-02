@@ -8,6 +8,7 @@ import {
   ApolloProvider,
   useQuery,
   gql,
+  useMutation,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
@@ -41,6 +42,7 @@ const ChatTest = (id) => {
             messages {
               id
               body
+              insertedAt
               user {
                 firstName
                 lastName
@@ -49,6 +51,28 @@ const ChatTest = (id) => {
           }
         }
       `;
+
+  const getNewData = client
+
+    .query({
+      query: gql`
+      query {
+        room(id: "${chatId}") {
+          messages {
+            id
+            body
+            insertedAt
+            user {
+              firstName
+              lastName
+            }
+          }
+        }
+      }
+    `,
+    })
+    .then((result) => result?.data?.room?.messages);
+
   const SEND_MESSAGES = gql`
     mutation {
       sendMessage(
@@ -60,31 +84,12 @@ const ChatTest = (id) => {
     }
   `;
 
-  const getNewData = client
-    .query({
-      query: gql`
-        query {
-          room(id: "${chatId}") {
-            messages {
-              id
-              body
-              user {
-                firstName
-                lastName
-              }
-            }
-          }
-        }
-      `,
-    })
-    .then((result) => result?.data?.room?.messages);
-
   const getAllMessages = getNewData.then(function (result) {
     const newMessages = Object.keys(result).map((item, index) => {
       return {
         _id: result[item].id,
         text: result[item].body,
-        createdAt: new Date(),
+        createdAt: result[item].insertedAt,
         user: {
           _id: item,
           name: `${result[item].user.firstName} ${result[item].user.lastName}`,
@@ -97,16 +102,19 @@ const ChatTest = (id) => {
 
   const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
-    allMessages();
-  }, []);
   const allMessages = async () => {
     const a = await getAllMessages;
     console.log(a);
     setMessages(a);
   };
 
+  useEffect(() => {
+    allMessages();
+  }, []);
+
   console.log(messages);
+
+  //sending message
 
   const onSend = useCallback((messages = []) => {
     setMessages((previousMessages) =>

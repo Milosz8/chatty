@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ApolloClient,
   InMemoryCache,
@@ -36,12 +36,24 @@ const ChatScreen = (id) => {
     cache: new InMemoryCache(),
   });
 
+  const SEND_MESSAGE = gql`
+    mutation {
+      sendMessage(
+        body: "${messages}"
+        roomId: "${chatId}"
+      ) {
+        id
+      }
+    }
+  `;
+
   const GET_MESSAGES = gql`
     query {
       room(id: "${chatId}") {
         messages {
           id
           body
+          insertedAt
           user {
             firstName
             lastName
@@ -51,34 +63,93 @@ const ChatScreen = (id) => {
     }
   `;
 
+  // function SendMessage() {
+  //   const { loading, error, data } = useQuery(SEND_MESSAGE, {
+
+  //     pollInterval: 500,
+  //   });
+
+  //   if (loading) return null;
+  //   if (error) return `Error! ${error}`;
+
+  //   return (
+  //     <img src={data.dog.displayImage} style={{ height: 100, width: 100 }} />
+  //   );
+  // }
+
   function GetTheMessage() {
-    const { loading, error, data } = useQuery(GET_MESSAGES);
+    const { loading, error, data } = useQuery(GET_MESSAGES, {
+      pollInterval: 500,
+    });
 
     if (loading) return <Text>Loading...</Text>;
     if (error) return <Text>Error :(</Text>;
-    console.log(data.room.messages);
 
     const users = data.room.messages;
 
-    console.log(users);
+    const usersArray = Object.keys(users).map((index) => {
+      return {
+        _id: users[index].id,
+        text: users[index].body,
+        createdAt: users[index].insertedAt,
+        user: {
+          _id: index, // to fix propper user id
+          name: `${users[index].user.firstName} ${users[index].user.lastName}`,
+        },
+      };
+    });
+
     users.forEach(function (item, index) {
       console.log(users[index].user.firstName);
     });
 
-    return data.room.messages.map(({ id, body, user }) => (
+    const messagesList = data.room.messages.map(({ id, body, user }) => (
       <View key={id}>
         <Text>{user.firstName + " " + user.lastName}</Text>
         <Text>{body}</Text>
       </View>
     ));
+
+    console.log("dupa", usersArray);
+
+    return (
+      <GiftedChat
+        messages={usersArray}
+        showAvatarForEveryMessage={true}
+        onSend={(messages) => onSend(messages)}
+        user={{
+          _id: 1,
+        }}
+      />
+    );
   }
+
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    // allMessages();
+  }, []);
+  const allMessages = async () => {
+    // const a = await getAllMessages;
+    // console.log(a);
+    // setMessages(a);
+  };
+
+  console.log(messages);
+
+  //sending message
+
+  const onSend = useCallback((messages = []) => {
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, messages)
+    );
+  }, []);
 
   return (
     <ApolloProvider client={client}>
-      <View>
-        <Text>Chat</Text>
-        <GetTheMessage />
-      </View>
+      {/* <Text>Chat</Text> */}
+
+      <GetTheMessage />
     </ApolloProvider>
   );
 };
