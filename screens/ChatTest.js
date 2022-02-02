@@ -49,6 +49,16 @@ const ChatTest = (id) => {
           }
         }
       `;
+  const SEND_MESSAGES = gql`
+    mutation {
+      sendMessage(
+        body: "${messages}"
+        roomId: "${chatId}"
+      ) {
+        id
+      }
+    }
+  `;
 
   const getNewData = client
     .query({
@@ -69,58 +79,34 @@ const ChatTest = (id) => {
     })
     .then((result) => result?.data?.room?.messages);
 
-  const newMessages = Object.keys(getNewData).map((item, index) => {
-    return {
-      _id: item.id,
-      text: item.body,
-      createdAt: new Date(),
-      user: {
-        _id: user.id,
-        name: `${item.firstName} ${item.lastName}`,
-      },
-    };
-  });
-
-  console.log(newMessages);
-
-  function GetTheMessage() {
-    const { loading, error, data } = useQuery(GET_MESSAGES);
-
-    if (loading) return <Text>Loading...</Text>;
-    if (error) return <Text>Error :(</Text>;
-    console.log(data.room.messages);
-
-    const users = data.room.messages;
-
-    console.log(users);
-    users.forEach(function (index) {
-      console.log(users[index].user.firstName);
+  const getAllMessages = getNewData.then(function (result) {
+    const newMessages = Object.keys(result).map((item, index) => {
+      return {
+        _id: result[item].id,
+        text: result[item].body,
+        createdAt: new Date(),
+        user: {
+          _id: item,
+          name: `${result[item].user.firstName} ${result[item].user.lastName}`,
+        },
+      };
     });
-
-    return data.room.messages.map(({ id, body, user }) => (
-      <View key={id}>
-        <Text>{user.firstName + " " + user.lastName}</Text>
-        <Text>{body}</Text>
-      </View>
-    ));
-  }
+    return newMessages;
+  });
+  console.log(getAllMessages);
 
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: "Hello developer",
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: "React Native",
-          avatar: "https://placeimg.com/140/140/any",
-        },
-      },
-    ]);
+    allMessages();
   }, []);
+  const allMessages = async () => {
+    const a = await getAllMessages;
+    console.log(a);
+    setMessages(a);
+  };
+
+  console.log(messages);
 
   const onSend = useCallback((messages = []) => {
     setMessages((previousMessages) =>
