@@ -1,5 +1,5 @@
-import { View, Text } from "react-native";
-import React, { useState, useEffect, useCallback } from "react";
+import { Text } from "react-native";
+import React from "react";
 import {
   ApolloClient,
   InMemoryCache,
@@ -7,7 +7,6 @@ import {
   ApolloProvider,
   useQuery,
   gql,
-  useMutation,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { GiftedChat } from "react-native-gifted-chat";
@@ -67,7 +66,6 @@ const ChatScreen = (id) => {
       }
     `,
     });
-    console.log(msg);
   }
 
   function GetTheMessage() {

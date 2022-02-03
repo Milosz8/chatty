@@ -1,7 +1,6 @@
-import { View, Text, Button } from "react-native";
-
-import React, { useState } from "react";
-import { StyleSheet } from "react-native-web";
+import { View, Text } from "react-native";
+import React from "react";
+import { StyleSheet, TouchableOpacity } from "react-native-web";
 import {
   ApolloClient,
   InMemoryCache,
@@ -14,11 +13,15 @@ import { setContext } from "@apollo/client/link/context";
 
 const styles = StyleSheet.create({
   RoomsWrapper: {
-    backgroundColor: "pink",
+    backgroundColor: "#5603AD",
     display: "flex",
     justifyContent: "center",
-    padding: 10,
-    margin: 10,
+    padding: 30,
+    marginTop: 40,
+    borderRadius: 12,
+  },
+  TextDecoration: {
+    color: "white",
   },
 });
 
@@ -81,16 +84,23 @@ const RoomsScreen = (props) => {
     if (loading) return <Text>Loading...</Text>;
     if (error) return <Text>Error :(</Text>;
     return data.usersRooms.rooms.map(({ id, name }) => (
-      <View key={id} style={styles.RoomsWrapper}>
-        <Text onPress={() => NavigateToChatScreen(props, id)}>{name}</Text>
-      </View>
+      <TouchableOpacity key={id}>
+        <View key={id} style={styles.RoomsWrapper}>
+          <Text
+            key={id}
+            style={styles.TextDecoration}
+            onPress={() => NavigateToChatScreen(props, id)}
+          >
+            {name}
+          </Text>
+        </View>
+      </TouchableOpacity>
     ));
   }
 
   return (
     <ApolloProvider client={client}>
       <View>
-        <Text>Rooms</Text>
         <GetTheRoom />
       </View>
     </ApolloProvider>

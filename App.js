@@ -1,10 +1,8 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ChatScreen from "./screens/ChatScreen";
 import RoomsScreen from "./screens/RoomsScreen";
-import ChatTest from "./screens/ChatTest";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,15 +17,37 @@ export default function App() {
             title: "Rooms",
             headerStyle: {
               backgroundColor: "#B6DEFD",
+              borderBottomLeftRadius: 24,
+              borderBottomRightRadius: 24,
+              height: 100,
             },
             headerTintColor: "#5603AD",
             headerTitleStyle: {
               fontWeight: "bold",
+              fontSize: 36,
             },
           }}
         />
-        <Stack.Screen name="Chat" component={ChatScreen} />
-        <Stack.Screen name="ChatTest" component={ChatTest} />
+
+        <Stack.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{
+            title: "ChatScreen",
+            //lack of time - dynamic title props
+            headerStyle: {
+              backgroundColor: "#B6DEFD",
+              borderBottomLeftRadius: 24,
+              borderBottomRightRadius: 24,
+              height: 100,
+            },
+            headerTintColor: "#5603AD",
+            headerTitleStyle: {
+              fontWeight: "bold",
+              fontSize: 16,
+            },
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
